@@ -1,0 +1,879 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee" uses_arrays="2"/>
+		<name>FIT5094_Assignment2_ Tutorial5_31069282</name>
+		<uuid>97f4b13e-9cca-45f8-9d80-d08dc472652d</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="1.9.5" isee:build_number="2097" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:sim_duration="8" isee:simulation_delay="0.205128" isee:restore_on_start="false" method="CYCLE_TIME" time_units="Years" isee:instantaneous_flows="false">
+		<start>1</start>
+		<stop>40</stop>
+		<dt>1</dt>
+	</sim_specs>
+	<dimensions>
+		<dim name="LoyaltyLevels" size="1"/>
+		<dim name="Membership_class">
+			<elem name="Basic"/>
+			<elem name="Priority"/>
+			<elem name="Priority_Plus"/>
+		</dim>
+		<dim name="Promotion" size="1"/>
+		<dim name="Promotion_labels">
+			<elem name="Priority"/>
+			<elem name="Priority_Plus"/>
+		</dim>
+	</dimensions>
+	<isee:prefs show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" saved_runs="3" keep="false" rifp="true"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+	</isee:time_formats>
+	<default_format/>
+	<model_units>
+		<unit name="People">
+			<eqn/>
+			<alias>person</alias>
+			<alias>persons</alias>
+		</unit>
+		<unit name="Dimensionless">
+			<eqn>1</eqn>
+			<alias>dmnl</alias>
+			<alias>unitless</alias>
+			<alias>fraction</alias>
+		</unit>
+		<unit name="Australian Dollars">
+			<eqn/>
+			<alias>AUD</alias>
+			<alias>australian dollar</alias>
+		</unit>
+		<unit name="Years">
+			<eqn/>
+			<alias>yr</alias>
+			<alias>year</alias>
+		</unit>
+	</model_units>
+	<model>
+		<variables>
+			<stock name="Priority Members">
+				<eqn>0</eqn>
+				<inflow>Basic_Members_Promotion_Rate</inflow>
+				<outflow>Priority_Members_Promotion_Rate</outflow>
+				<outflow>PM_lost</outflow>
+				<non_negative/>
+				<units>People</units>
+			</stock>
+			<flow name="Basic Members\nPromotion Rate">
+				<eqn>Basic_Members/Promotion_time[1,Priority]</eqn>
+				<non_negative/>
+				<units>People/Years</units>
+			</flow>
+			<flow name="Join\nRate">
+				<eqn>Marketing_economic_effect + Word_of_mouth_result</eqn>
+				<non_negative/>
+				<units>People/Years</units>
+			</flow>
+			<stock name="Basic Members">
+				<eqn>0</eqn>
+				<inflow>Join_Rate</inflow>
+				<outflow>Basic_Members_Promotion_Rate</outflow>
+				<outflow>BM_lost_rate</outflow>
+				<non_negative/>
+				<units>People</units>
+			</stock>
+			<aux name="Marketing\nspending">
+				<eqn>250000</eqn>
+				<units>AUD</units>
+			</aux>
+			<aux name="Marketing\nimpact">
+				<eqn>0.002</eqn>
+				<units>dmnl</units>
+			</aux>
+			<stock name="Priority Plus Members">
+				<eqn>0</eqn>
+				<inflow>Priority_Members_Promotion_Rate</inflow>
+				<outflow>PPM_lost_rate</outflow>
+				<non_negative/>
+				<units>People</units>
+			</stock>
+			<flow name="Priority Members\nPromotion Rate">
+				<eqn>Priority_Members/Promotion_time[1,Priority_Plus]</eqn>
+				<non_negative/>
+				<units>People/Years</units>
+			</flow>
+			<aux name="Economic factor">
+				<eqn>COUNTER(0, 8)</eqn>
+				<gf type="discrete">
+					<yscale min="0" max="100"/>
+					<xpts>0,1,2,3,4,5,6,7</xpts>
+					<ypts>100,100,150,150,80,80,200,200</ypts>
+				</gf>
+				<units>dmnl</units>
+			</aux>
+			<aux name="Loyalty rate">
+				<dimensions>
+					<dim name="LoyaltyLevels"/>
+					<dim name="Membership_class"/>
+				</dimensions>
+				<element subscript="1, Basic">
+					<eqn>36</eqn>
+				</element>
+				<element subscript="1, Priority">
+					<eqn>58</eqn>
+				</element>
+				<element subscript="1, Priority_Plus">
+					<eqn>73</eqn>
+				</element>
+				<units>%</units>
+			</aux>
+			<flow name="BM lost rate">
+				<eqn>Basic_Members*(1-Competition_loyalty_effect[1,Basic])</eqn>
+				<non_negative/>
+				<units>People/Years</units>
+			</flow>
+			<stock name="Basic Members\nLost">
+				<eqn>0</eqn>
+				<inflow>BM_lost_rate</inflow>
+				<non_negative/>
+				<units>People</units>
+			</stock>
+			<flow name="PM lost">
+				<eqn>Priority_Members*(1-Competition_loyalty_effect[1,Priority])</eqn>
+				<non_negative/>
+				<units>People/Years</units>
+			</flow>
+			<stock name="Priority Members\nLost">
+				<eqn>0</eqn>
+				<inflow>PM_lost</inflow>
+				<non_negative/>
+				<units>People</units>
+			</stock>
+			<flow name="PPM lost rate">
+				<eqn>Priority_Plus_Members*(1-Competition_loyalty_effect[1,Priority_Plus])</eqn>
+				<non_negative/>
+				<units>People/Years</units>
+			</flow>
+			<stock name="Priority Plus\nMembers Lost">
+				<eqn>0</eqn>
+				<inflow>PPM_lost_rate</inflow>
+				<non_negative/>
+				<units>People</units>
+			</stock>
+			<aux name="Competition factor">
+				<eqn>COUNTER(0, 40)</eqn>
+				<gf type="discrete">
+					<yscale min="0" max="2"/>
+					<xpts>0,10,20,30</xpts>
+					<ypts>1,1.25,0.8,0.5</ypts>
+				</gf>
+				<units>dmnl</units>
+			</aux>
+			<aux name="Total\nmembers">
+				<eqn>Basic_Members + Priority_Members + Priority_Plus_Members</eqn>
+				<isee:summing/>
+				<units>People</units>
+			</aux>
+			<aux name="Fixed\ncosts">
+				<eqn>600</eqn>
+				<units>People</units>
+			</aux>
+			<aux name="Variable\ncosts">
+				<eqn>5</eqn>
+				<units>People</units>
+			</aux>
+			<aux name="Customer satisfaction\nlevel">
+				<eqn>30</eqn>
+				<units>People</units>
+			</aux>
+			<aux name="Service\nrepresentatives">
+				<eqn>TIME</eqn>
+				<gf type="discrete">
+					<yscale min="0" max="100"/>
+					<xpts>0,11,21,31</xpts>
+					<ypts>35,40,50,65</ypts>
+				</gf>
+				<units>People</units>
+			</aux>
+			<aux name="Word of mouth">
+				<eqn>500</eqn>
+				<units>People</units>
+			</aux>
+			<aux name="Optimal load">
+				<eqn>Service_representatives*Customer_satisfaction_level</eqn>
+				<units>People</units>
+			</aux>
+			<aux name="Profitable load">
+				<eqn>(Service_representatives*Variable_costs) + Fixed_costs</eqn>
+				<units>People</units>
+			</aux>
+			<aux name="Word of mouth\nresult">
+				<eqn>Total_members/Word_of_mouth</eqn>
+				<units>People/Year</units>
+			</aux>
+			<aux name="Competition\nloyalty\neffect">
+				<dimensions>
+					<dim name="LoyaltyLevels"/>
+					<dim name="Membership_class"/>
+				</dimensions>
+				<eqn>(Loyalty_rate/100)/Competition_factor</eqn>
+				<units>dmnl</units>
+			</aux>
+			<aux name="Total lost\nmembers">
+				<eqn>Basic_Members_Lost + Priority_Members_Lost + Priority_Plus_Members_Lost</eqn>
+				<isee:summing/>
+				<units>People</units>
+			</aux>
+			<aux name="Marketing\neconomic\neffect">
+				<eqn>(Economic_factor/100)*Marketing_impact*Marketing_spending</eqn>
+				<units>People/Year</units>
+			</aux>
+			<aux name="Promotion\ntime">
+				<dimensions>
+					<dim name="Promotion"/>
+					<dim name="Promotion_labels"/>
+				</dimensions>
+				<element subscript="1, Priority">
+					<eqn>10</eqn>
+				</element>
+				<element subscript="1, Priority_Plus">
+					<eqn>25</eqn>
+				</element>
+				<units>Years</units>
+			</aux>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595" popup_corner_radius="0" popup_background_color="#FFFECF"/>
+				<slider color="#66CC66" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="#E95F74" background="silver"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch" isee:on_color="green"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt" isee:show_hover_tip="true"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+				<isee:navigation_widget color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_color="#999999" border_width="thin" border_style="solid" item_spacing="6" appearance="tabs" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD"/>
+				<isee:shape color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid" opacity="1" transparent_background="true"/>
+				<isee:selector color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:iframe color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid"/>
+				<isee:financial_table color="black" background="#E0E0E0" text_align="right" font_size="12pt" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<view isee:show_pages="false" background="white" page_width="1056" page_height="816" isee:page_cols="2" zoom="160" isee:popup_graphs_are_comparative="true" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<stock x="410.834" y="128" name="Priority Members"/>
+				<flow label_side="top" x="330.5" y="128" name="Basic Members\nPromotion Rate">
+					<pts>
+						<pt x="284.667" y="128"/>
+						<pt x="388.334" y="128"/>
+					</pts>
+				</flow>
+				<flow x="168.167" y="128" name="Join\nRate">
+					<pts>
+						<pt x="95" y="128"/>
+						<pt x="241.333" y="128"/>
+					</pts>
+				</flow>
+				<stock label_side="top" x="241.333" y="110.083" width="43.3333" height="35.8333" name="Basic Members"/>
+				<aux x="82.6429" y="193.792" name="Marketing\nspending"/>
+				<aux x="202.143" y="179.071" name="Marketing\nimpact"/>
+				<connector uid="1" angle="316.594">
+					<from>Basic_Members</from>
+					<to>Basic_Members_Promotion_Rate</to>
+				</connector>
+				<stock x="579" y="128.667" name="Priority Plus Members"/>
+				<flow x="488.917" y="128.667" name="Priority Members\nPromotion Rate">
+					<pts>
+						<pt x="433.334" y="128.667"/>
+						<pt x="556.5" y="128.667"/>
+					</pts>
+				</flow>
+				<connector uid="2" angle="326.729">
+					<from>Priority_Members</from>
+					<to>Priority_Members_Promotion_Rate</to>
+				</connector>
+				<aux x="161.643" y="293.667" name="Economic factor"/>
+				<aux x="354.339" y="275.667" name="Loyalty rate"/>
+				<flow x="263" y="204.625" name="BM lost rate">
+					<pts>
+						<pt x="263" y="145.916"/>
+						<pt x="263" y="275.334"/>
+					</pts>
+				</flow>
+				<stock label_side="bottom" x="263.084" y="292.834" name="Basic Members\nLost"/>
+				<connector uid="3" angle="306.051">
+					<from>Basic_Members</from>
+					<to>BM_lost_rate</to>
+				</connector>
+				<flow x="406.667" y="204.417" name="PM lost">
+					<pts>
+						<pt x="406.667" y="145.5"/>
+						<pt x="406.667" y="275.334"/>
+					</pts>
+				</flow>
+				<stock label_side="bottom" x="406.667" y="292.834" name="Priority Members\nLost"/>
+				<connector uid="4" angle="294.005">
+					<from>Priority_Members</from>
+					<to>PM_lost</to>
+				</connector>
+				<flow x="580.167" y="206.5" name="PPM lost rate">
+					<pts>
+						<pt x="580.167" y="146.167"/>
+						<pt x="580.167" y="278.833"/>
+					</pts>
+				</flow>
+				<stock label_side="bottom" x="580.167" y="296.333" name="Priority Plus\nMembers Lost"/>
+				<connector uid="5" angle="310.684">
+					<from>Priority_Plus_Members</from>
+					<to>PPM_lost_rate</to>
+				</connector>
+				<aux x="304.042" y="344.279" name="Competition factor"/>
+				<aux x="64.6429" y="34.1667" name="Total\nmembers"/>
+				<aux label_side="bottom" x="633.667" y="155.167" name="Fixed\ncosts"/>
+				<aux label_side="bottom" x="643.667" y="257.667" name="Variable\ncosts"/>
+				<aux x="806.166" y="275.667" name="Customer satisfaction\nlevel"/>
+				<aux x="703.667" y="269" name="Service\nrepresentatives"/>
+				<aux label_side="right" x="137.214" y="26.6667" name="Word of mouth"/>
+				<aux x="725.953" y="193.792" name="Optimal load"/>
+				<connector uid="6" angle="58.6395">
+					<from>Service_representatives</from>
+					<to>Optimal_load</to>
+				</connector>
+				<connector uid="7" angle="118.186">
+					<from>Customer_satisfaction_level</from>
+					<to>Optimal_load</to>
+				</connector>
+				<aux x="670.214" y="203.5" name="Profitable load"/>
+				<connector uid="8" angle="117.055">
+					<from>Service_representatives</from>
+					<to>Profitable_load</to>
+				</connector>
+				<connector uid="9" angle="63.8907">
+					<from>Variable_costs</from>
+					<to>Profitable_load</to>
+				</connector>
+				<connector uid="10" angle="312.059">
+					<from>Fixed_costs</from>
+					<to>Profitable_load</to>
+				</connector>
+				<aux label_side="bottom" x="125.643" y="80.786" name="Word of mouth\nresult"/>
+				<connector uid="11" angle="310.629">
+					<from>Word_of_mouth</from>
+					<to>Word_of_mouth_result</to>
+				</connector>
+				<connector uid="12" angle="13.1884">
+					<from>Word_of_mouth_result</from>
+					<to>Join_Rate</to>
+				</connector>
+				<aux label_side="top" x="322.042" y="229.792" name="Competition\nloyalty\neffect"/>
+				<connector uid="13" angle="59.421">
+					<from>Competition_factor</from>
+					<to>Competition_loyalty_effect</to>
+				</connector>
+				<connector uid="14" angle="38.4631">
+					<from>Loyalty_rate</from>
+					<to>Competition_loyalty_effect</to>
+				</connector>
+				<connector uid="15" angle="156.914">
+					<from>Competition_loyalty_effect</from>
+					<to>BM_lost_rate</to>
+				</connector>
+				<connector uid="16" angle="26.0661">
+					<from>Competition_loyalty_effect</from>
+					<to>PM_lost</to>
+				</connector>
+				<connector uid="17" angle="14.6209">
+					<from>
+						<alias uid="18"/>
+					</from>
+					<to>PPM_lost_rate</to>
+				</connector>
+				<connector uid="19" angle="336.679">
+					<from>Total_members</from>
+					<to>Word_of_mouth_result</to>
+				</connector>
+				<aux x="488.917" y="319.334" name="Total lost\nmembers"/>
+				<aux x="143.643" y="211.792" name="Marketing\neconomic\neffect"/>
+				<connector uid="20" angle="34.3148">
+					<from>Economic_factor</from>
+					<to>Marketing_economic_effect</to>
+				</connector>
+				<connector uid="21" angle="178.886">
+					<from>Marketing_impact</from>
+					<to>Marketing_economic_effect</to>
+				</connector>
+				<connector uid="22" angle="99.9649">
+					<from>Marketing_economic_effect</from>
+					<to>Join_Rate</to>
+				</connector>
+				<connector uid="23" angle="351.569">
+					<from>Marketing_spending</from>
+					<to>Marketing_economic_effect</to>
+				</connector>
+				<aux label_side="left" x="398.571" y="34.1667" name="Promotion\ntime"/>
+				<connector uid="24" angle="258.06">
+					<from>Promotion_time</from>
+					<to>Basic_Members_Promotion_Rate</to>
+				</connector>
+				<connector uid="25" angle="337.093">
+					<from>Promotion_time</from>
+					<to>Priority_Members_Promotion_Rate</to>
+				</connector>
+				<alias color="blue" background="white" font_style="italic" uid="18" x="494.571" y="211" width="18" height="18">
+					<shape type="circle" radius="18"/>
+					<of>Competition_loyalty_effect</of>
+				</alias>
+			</view>
+			<view isee:template_view="template:1" background="#FFFEF4" page_width="1066" page_height="600" home_view="true" type="interface">
+				<style/>
+				<stacked_container uid="26" x="614.5" y="102.5" width="452.5" height="316">
+					<graph background="#FFFEF4" font_weight="bold" font_size="18pt" isee:graph_area_color="#FFFEF4" isee:hide_border="false" axis_title_font_weight="bold" axis_title_font_size="14pt" axis_label_font_weight="bold" axis_label_font_size="12pt" width="452.5" height="316" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="10" num_y_labels="9" title="EIC members growth analysis" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_title="Members" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Total_members"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Profitable_load"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" title=" Optimal load" isee:keep_zero_visible="true" pen_width="1" index="2" show_y_axis="true">
+							<entity name="Optimal_load"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<knob color="#3C75A6" font_weight="bold" font_size="11pt" wrap_title="true" uid="27" x="259" y="218.5" width="119" height="103" increment="50000" min="0" max="1000000" title="Marketing spending" isee:navigate_to="false" show_name="true">
+					<entity name="Marketing_spending"/>
+					<reset_to after="never">0</reset_to>
+				</knob>
+				<button background="#55AA00" font_weight="bold" font_color="white" font_size="14pt" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="" uid="28" x="1019" y="438">
+					<actions>
+						<action>start</action>
+					</actions>
+				</button>
+				<button background="#649BB8" font_weight="bold" font_color="white" font_size="14pt" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="" uid="29" x="1018" y="578">
+					<actions>
+						<action>restore_all</action>
+					</actions>
+				</button>
+				<button background="#DA965A" font_weight="bold" font_color="white" font_size="14pt" transparent="false" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="Live" uid="30" x="1018" y="543.5">
+					<actions>
+						<action>start_stella_live</action>
+					</actions>
+				</button>
+				<numeric_display color="#FFFEF4" font_size="14pt" uid="31" x="422.5" y="452" width="187" height="34" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+					<entity name="Basic_Members"/>
+				</numeric_display>
+				<numeric_display color="#FFFEF4" font_size="14pt" uid="32" x="422.5" y="520" width="187" height="30" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+					<entity name="Priority_Plus_Members"/>
+				</numeric_display>
+				<numeric_display color="#FFFEF4" font_size="14pt" uid="33" x="422.5" y="485" width="187" height="34" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+					<entity name="Priority_Members"/>
+				</numeric_display>
+				<text_box background="#FFFEF4" font_weight="bold" font_size="16pt" uid="34" x="451.5" y="425.5" width="143" height="19">Members gained</text_box>
+				<numeric_display color="#FFFEF4" font_size="14pt" uid="35" x="678.5" y="452" width="187" height="32" title="Basic members" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+					<entity name="Basic_Members_Lost"/>
+				</numeric_display>
+				<numeric_display color="#FFFEF4" font_size="14pt" uid="36" x="678.5" y="517" width="187" height="34" title="Priority Plus Members" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+					<entity name="Priority_Plus_Members_Lost"/>
+				</numeric_display>
+				<numeric_display color="#FFFEF4" font_size="14pt" uid="37" x="678.5" y="484" width="187" height="34" title="Priority Members" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+					<entity name="Priority_Members_Lost"/>
+				</numeric_display>
+				<text_box background="#FFFEF4" font_weight="bold" font_size="16pt" uid="38" x="720.5" y="425.5" width="143" height="19">Members lost</text_box>
+				<button background="red" font_weight="bold" font_color="white" font_size="14pt" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="" uid="39" x="987" y="493" width="64" height="31">
+					<actions>
+						<action>stop</action>
+					</actions>
+				</button>
+				<isee:annotation background="#4E8C2D" font_weight="bold" font_color="#FFFEF4" font_size="14pt" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" popup_background_color="#EFFFB7" launcher_label="Instructions" show_by_default="false" hide_launcher="false" uid="40" x="22" y="87.5" width="91.25" height="35">
+					<popup hide_when_editing="true" x="127.5" y="86.875" width="382" height="377.25">
+						<text>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt;Run the model by clicking &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;RUN&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt; button&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;Description of other buttons:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;Restore&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt; - restore default values of all instances&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;Live&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt; - provide real time feedback based on the changed control elements&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;Pause&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt; - pause simulation&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;Stop &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt;- stop simulation&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;Members Gain&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt; - go to the page with detailed information about members gain&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;Members Lost&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt; - go to the page with detailed information about members lost&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;Control elements:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt;Provide opportunity to change inputs and see changes in the forecast&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;Marketing impact, service representatives, Economic factor, Competition factor&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt; - change over time by default, if value is changed, it applied to all time periods fixed&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;Members Gain &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt;and &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;Member Lost&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt; pages provide functionality to &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;RUN&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt; and &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt;STOP&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt;, also to navigate between pages&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Arial&apos;; font-size:10pt; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</text>
+					</popup>
+				</isee:annotation>
+				<numeric_display color="#FFFEF4" font_weight="bold" font_size="14pt" uid="41" x="422.5" y="551" width="187" height="34" title="Total gained" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+					<entity name="Total_members"/>
+				</numeric_display>
+				<numeric_display color="#FFFEF4" font_weight="bold" font_size="14pt" uid="42" x="678.5" y="551" width="187" height="34" title="Total lost" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+					<entity name="Total_lost_members"/>
+				</numeric_display>
+				<numeric_display color="#FFFEF4" font_weight="bold" font_size="14pt" uid="43" x="420.5" y="249" width="187" height="27" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+					<entity name="Profitable_load"/>
+				</numeric_display>
+				<numeric_display color="#FFFEF4" font_weight="bold" font_size="14pt" uid="44" x="420.5" y="277" width="187" height="28" title="Optimal load" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+					<entity name="Optimal_load"/>
+				</numeric_display>
+				<text_box background="#FFFEF4" font_weight="bold" font_size="16pt" uid="45" x="455.5" y="222.5" width="143" height="19">Key indicators</text_box>
+				<slider font_weight="bold" num_ticks="4" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" uid="46" x="-2" y="444.5" width="193" height="78" increment="10" min="10" max="400" isee:navigate_to="false" show_name="true">
+					<format precision="full" display_as="percent"/>
+					<entity name="Economic_factor"/>
+					<reset_to after="never">1</reset_to>
+				</slider>
+				<slider font_weight="bold" num_ticks="6" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" uid="47" x="211.5" y="442" width="193" height="78" increment="0.1" min="0.1" max="2" isee:navigate_to="false" show_name="true">
+					<entity name="Competition_factor"/>
+					<reset_to after="never">1</reset_to>
+				</slider>
+				<slider font_weight="bold" num_ticks="6" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" uid="48" x="211.5" y="371" width="193" height="78" increment="5" min="5" max="200" isee:navigate_to="false" show_name="true">
+					<entity name="Service_representatives"/>
+					<reset_to after="never">1</reset_to>
+				</slider>
+				<knob color="#3C75A6" font_weight="bold" font_size="11pt" uid="49" x="8.75" y="265" width="112.5" height="94" increment="50" min="0" max="1000" isee:navigate_to="false" show_name="true">
+					<entity name="Fixed_costs"/>
+					<reset_to after="never">0</reset_to>
+				</knob>
+				<knob color="#3C75A6" font_weight="bold" font_size="11pt" uid="50" x="132.5" y="266.5" width="112.5" height="94" increment="1" min="0" max="20" isee:navigate_to="false" show_name="true">
+					<entity name="Variable_costs"/>
+					<reset_to after="never">0</reset_to>
+				</knob>
+				<knob color="#3C75A6" font_weight="bold" font_size="11pt" uid="51" x="127.5" y="172.5" width="122.5" height="103.5" increment="1" min="1" max="100" isee:navigate_to="false" show_name="true">
+					<entity name="Customer_satisfaction_level"/>
+					<reset_to after="never">0</reset_to>
+				</knob>
+				<knob color="#3C75A6" font_weight="bold" font_size="11pt" uid="52" x="11.75" y="169.5" width="111.75" height="95.25" increment="100" min="1" max="5000" isee:navigate_to="false" show_name="true">
+					<entity name="Word_of_mouth"/>
+					<reset_to after="never">0</reset_to>
+				</knob>
+				<text_box background="#FFFEF4" font_weight="bold" font_size="18pt" uid="53" x="123.5" y="138.5" width="192.75" height="20">Control elements</text_box>
+				<isee:array_input background="#FFFEF4" uid="54" x="0.5" y="520" width="235" height="78.5" title="Loyalty rates" entity="Loyalty_rate" suffix=" %"/>
+				<isee:array_input z_index="-2" background="#FFFEF4" uid="55" x="234.5" y="520" width="168" height="79" title="Promotion time" isee:appearance="dropdown" entity="Promotion_time" suffix=" years"/>
+				<slider font_weight="bold" uid="56" x="-2" y="371" width="193" height="78" increment="0.001" min="0.001" max="0.006" isee:navigate_to="false" show_name="true">
+					<entity name="Marketing_impact"/>
+					<reset_to after="never">0</reset_to>
+				</slider>
+				<text_box background="#FFFEF4" font_weight="bold" font_size="18pt" uid="57" x="467" y="140" width="85" height="27.5">Results</text_box>
+				<button background="#00AAFF" font_weight="bold" font_color="white" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="Members Gain" uid="58" x="927" y="492">
+					<actions>
+						<action target="interface:1">navigate</action>
+					</actions>
+				</button>
+				<button background="#AA557F" font_weight="bold" font_color="white" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="Members Lost" uid="59" x="927" y="536">
+					<actions>
+						<action target="interface:2">navigate</action>
+					</actions>
+				</button>
+				<text_box z_index="-3" background="#FFFEF4" font_weight="bold" font_size="24pt" uid="60" x="257" y="73.5" width="570" height="30">Car insurance membership forecast for 40 years</text_box>
+				<button background="#D2D517" font_weight="bold" font_size="14pt" transparent="false" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="" uid="61" x="1019" y="473">
+					<actions>
+						<action>pause</action>
+					</actions>
+				</button>
+			</view>
+			<view isee:template_view="template:1" background="#FFFEF4" page_width="1066" page_height="600" type="interface">
+				<style/>
+				<stacked_container uid="62" x="-4" y="70" width="673" height="529" z_index="-2">
+					<table background="#FFFEF4" isee:use_alternate_row_colors="true" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_weight="bold" width="673" height="529">
+						<item type="time"/>
+						<item>
+							<entity name="Basic_Members"/>
+						</item>
+						<item>
+							<entity name="Priority_Members"/>
+						</item>
+						<item>
+							<entity name="Priority_Plus_Members"/>
+						</item>
+						<item>
+							<entity name="Total_members"/>
+						</item>
+						<item>
+							<entity name="Profitable_load"/>
+						</item>
+						<item>
+							<entity name="Optimal_load"/>
+						</item>
+					</table>
+				</stacked_container>
+				<stacked_container uid="63" x="663" y="115" width="414" height="406" z_index="-4">
+					<graph background="#FFFEF4" font_weight="bold" isee:graph_area_color="#FFFEF4" axis_title_font_weight="bold" axis_label_font_weight="bold" axis_label_font_size="12pt" width="414" height="406" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="10" num_y_labels="9" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_title="Members" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="#047C02" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Basic_Members"/>
+						</plot>
+						<plot color="#FFAA00" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Priority_Members"/>
+						</plot>
+						<plot color="blue" pen_style="dashed" isee:keep_zero_visible="true" pen_width="1" index="2" show_y_axis="true">
+							<entity name="Total_members"/>
+						</plot>
+						<plot color="#FF007F" isee:keep_zero_visible="true" pen_width="1" index="3" show_y_axis="true">
+							<entity name="Priority_Plus_Members"/>
+						</plot>
+						<plot color="#FF5500" pen_style="dashed" isee:keep_zero_visible="true" pen_width="1" index="4" show_y_axis="true">
+							<entity name="Profitable_load"/>
+						</plot>
+						<plot color="#0CA0FF" pen_style="dashed" isee:keep_zero_visible="true" pen_width="1" index="5" show_y_axis="true">
+							<entity name="Optimal_load"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<text_box background="#FFFEF4" font_weight="bold" font_size="20pt" uid="64" x="743" y="84" width="294" height="26">Gained members analysis</text_box>
+				<button background="#55AA00" font_weight="bold" font_color="white" font_size="14pt" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="" uid="65" x="990" y="540">
+					<actions>
+						<action>start</action>
+					</actions>
+				</button>
+				<button background="red" font_weight="bold" font_color="white" font_size="14pt" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="" uid="66" x="990" y="576">
+					<actions>
+						<action>stop</action>
+					</actions>
+				</button>
+				<button background="#AA557F" font_weight="bold" font_color="white" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="Members Lost" uid="67" x="877" y="560">
+					<actions>
+						<action target="interface:2">navigate</action>
+					</actions>
+				</button>
+				<button background="yellow" font_weight="bold" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="" uid="68" x="783" y="560">
+					<actions>
+						<action target="home_page">navigate</action>
+					</actions>
+				</button>
+			</view>
+			<view isee:template_view="template:1" background="#FFFEF4" page_width="1066" page_height="600" type="interface">
+				<style/>
+				<stacked_container uid="69" x="-1" y="69" width="609" height="531">
+					<table background="#FFFEF4" font_weight="bold" isee:use_alternate_row_colors="true" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_weight="bold" width="609" height="531">
+						<item type="time"/>
+						<item>
+							<entity name="Basic_Members_Lost"/>
+						</item>
+						<item>
+							<entity name="Priority_Members_Lost"/>
+						</item>
+						<item>
+							<entity name="Priority_Plus_Members_Lost"/>
+						</item>
+						<item>
+							<entity name="Total_lost_members"/>
+						</item>
+					</table>
+				</stacked_container>
+				<stacked_container uid="70" x="599" y="121" width="490" height="382" z_index="-2">
+					<graph background="#FFFEF4" font_weight="bold" font_size="16pt" isee:graph_area_color="#FFFEF4" axis_title_font_weight="bold" axis_label_font_weight="bold" axis_label_font_size="12pt" width="490" height="382" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="10" num_y_labels="11" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_title="Members" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Basic_Members_Lost"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Priority_Members_Lost"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" isee:keep_zero_visible="true" pen_width="1" index="2" show_y_axis="true">
+							<entity name="Priority_Plus_Members_Lost"/>
+						</plot>
+						<plot color="#008F44" pen_style="dashed" isee:keep_zero_visible="true" pen_width="1" index="3" show_y_axis="true">
+							<entity name="Total_lost_members"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<button background="yellow" font_weight="bold" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="" uid="71" x="718" y="547">
+					<actions>
+						<action target="home_page">navigate</action>
+					</actions>
+				</button>
+				<button background="#55AA00" font_weight="bold" font_color="white" font_size="14pt" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="" uid="72" x="938" y="528">
+					<actions>
+						<action>start</action>
+					</actions>
+				</button>
+				<button background="red" font_weight="bold" font_color="white" font_size="14pt" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="" uid="73" x="938" y="572">
+					<actions>
+						<action>stop</action>
+					</actions>
+				</button>
+				<text_box background="#FFFEF4" font_weight="bold" font_size="20pt" uid="74" x="673" y="90" width="314" height="31">Lost members analysis</text_box>
+				<button background="#00AAFF" font_weight="bold" font_color="white" isee:flat="true" isee:highlight_on_hover="true" isee:highlight_color="#00DA00" label="Members Gain" uid="75" x="837" y="547">
+					<actions>
+						<action target="interface:1">navigate</action>
+					</actions>
+				</button>
+			</view>
+			<isee:templates>
+				<view background="#FFFEF4" page_width="1066" page_height="600" type="template">
+					<style/>
+					<text_box background="#FFFF7F" font_weight="bold" vertical_text_align="center" font_size="28pt" padding="12" border_width="thin" border_style="solid" uid="76" x="-2" y="-3" width="1070" height="75">Elite Insurance Company</text_box>
+				</view>
+			</isee:templates>
+			<isee:stories>
+				<isee:story uid="77" name="Story 1">
+					<view background="white" page_width="1066" page_height="600" type="interface">
+						<style/>
+						<isee:model_view uid="78" x="0" y="0" width="1066" height="600" isee:locked="true" zoom="1" center_x="533" center_y="300" locked_view="true" transparent="true" use_visible_list="true">
+							<model name="Top-Level"/>
+							<isee:visible_list>
+								<entity name="Join_Rate"/>
+								<entity name="PM_lost"/>
+								<entity name="Priority_Members"/>
+								<entity name="Basic_Members"/>
+								<entity name="Priority_Members_Promotion_Rate"/>
+								<entity name="Basic_Members_Lost"/>
+								<entity name="Priority_Members_Lost"/>
+								<entity name="BM_lost_rate"/>
+								<entity name="Basic_Members_Promotion_Rate"/>
+								<entity name="PPM_lost_rate"/>
+								<entity name="Priority_Plus_Members"/>
+								<entity name="Priority_Plus_Members_Lost"/>
+							</isee:visible_list>
+							<isee:highlight_list/>
+						</isee:model_view>
+						<text_box font_weight="bold" font_size="24pt" uid="79" x="263" y="34" width="260" height="58">EIC MAINLINE</text_box>
+					</view>
+				</isee:story>
+				<isee:story uid="80" name="Story 2">
+					<view background="white" page_width="1066" page_height="600" type="interface">
+						<style/>
+						<isee:model_view uid="81" x="0" y="0" width="1066" height="600" isee:locked="true" zoom="1" center_x="533" center_y="300" locked_view="true" transparent="true" use_visible_list="true">
+							<model name="Top-Level"/>
+							<isee:visible_list>
+								<entity name="Total_members"/>
+								<entity name="Basic_Members"/>
+								<item uid="19"/>
+								<entity name="Economic_factor"/>
+								<item uid="11"/>
+								<entity name="Word_of_mouth_result"/>
+								<item uid="22"/>
+								<item uid="12"/>
+								<entity name="Marketing_spending"/>
+								<entity name="Marketing_impact"/>
+								<item uid="21"/>
+								<item uid="23"/>
+								<entity name="Join_Rate"/>
+								<item uid="20"/>
+								<entity name="Word_of_mouth"/>
+								<entity name="Marketing_economic_effect"/>
+							</isee:visible_list>
+							<isee:highlight_list/>
+						</isee:model_view>
+						<text_box font_weight="bold" font_size="20pt" uid="82" x="413" y="19" width="260" height="58">Join customers</text_box>
+					</view>
+				</isee:story>
+				<isee:story uid="83" name="Story 3">
+					<view background="white" page_width="1066" page_height="600" type="interface">
+						<style/>
+						<isee:model_view uid="84" x="0" y="0" width="1066" height="600" isee:locked="true" zoom="1" center_x="533" center_y="300" locked_view="true" transparent="true" use_visible_list="true">
+							<model name="Top-Level"/>
+							<isee:visible_list>
+								<item uid="15"/>
+								<entity name="Competition_loyalty_effect"/>
+								<entity name="Competition_factor"/>
+								<entity name="Basic_Members_Promotion_Rate"/>
+								<item uid="13"/>
+								<item uid="3"/>
+								<entity name="Loyalty_rate"/>
+								<entity name="Basic_Members"/>
+								<item uid="24"/>
+								<item uid="14"/>
+								<entity name="Priority_Members"/>
+								<entity name="Basic_Members_Lost"/>
+								<item uid="1"/>
+								<entity name="BM_lost_rate"/>
+								<entity name="Promotion_time"/>
+							</isee:visible_list>
+							<isee:highlight_list/>
+						</isee:model_view>
+						<text_box font_weight="bold" font_size="20pt" uid="85" x="598" y="62" width="268" height="80">Promotion of Basic member and loosing of existent customers</text_box>
+					</view>
+				</isee:story>
+				<isee:story uid="86" name="Story 4">
+					<view background="white" page_width="1066" page_height="600" isee:scroll_x="369" type="interface">
+						<style/>
+						<isee:model_view uid="87" x="0" y="0" width="1066" height="600" isee:locked="true" zoom="1" center_x="533" center_y="300" locked_view="true" transparent="true" use_visible_list="true">
+							<model name="Top-Level"/>
+							<isee:visible_list>
+								<item uid="10"/>
+								<item uid="9"/>
+								<item uid="8"/>
+								<entity name="Service_representatives"/>
+								<item uid="6"/>
+								<entity name="Customer_satisfaction_level"/>
+								<entity name="Optimal_load"/>
+								<entity name="Variable_costs"/>
+								<entity name="Profitable_load"/>
+								<item uid="7"/>
+								<entity name="Fixed_costs"/>
+							</isee:visible_list>
+							<isee:highlight_list/>
+						</isee:model_view>
+						<text_box font_weight="bold" font_size="20pt" uid="88" x="643" y="59" width="260" height="58">Management key factors</text_box>
+					</view>
+				</isee:story>
+			</isee:stories>
+		</views>
+	</model>
+</xmile>
+
